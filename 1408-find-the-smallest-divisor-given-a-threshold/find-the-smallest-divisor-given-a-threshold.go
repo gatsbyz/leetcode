@@ -1,38 +1,24 @@
 func smallestDivisor(nums []int, threshold int) int {
-	l, r := 1, max(nums...)
-	for l <= r {
-		m := (l + r) >> 1
-		v := helper(nums, m)
-		if v <= threshold {
-			r = m-1
-		} else {
-			l = m+1
-		}
-	}
-	return l
-}
+    left := 0
+    right := 1000000
 
-func helper(nums []int, d int) int {
-	summary := 0
-	for _, v := range nums {
-		summary += v / d
-		if v % d != 0 {
-			summary++
-		}
-	}
-	return summary
-}
+    for left <= right {
+        mid :=  left + (right-left)/2
+        d := 0.0
 
-func max(values ...int) int {
-	maxValue := math.MinInt32
-	for _, v := range values {
-		if v > maxValue {
-			maxValue = v
-		}
-	}
-	return maxValue
-}
+        for _, n := range nums {
+            d += math.Ceil(float64(n)/float64(mid))
+        }
 
+        if d <= float64(threshold) {
+            right = mid -1
+        } else {
+            left = mid + 1
+        }
+    }
+
+    return left
+}
 // 1,2,5,9 - 6
 // 1 1+2+5+9 = 17
 // 2 1+1+3+5 = 10
