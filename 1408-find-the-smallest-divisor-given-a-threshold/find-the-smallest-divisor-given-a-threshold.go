@@ -1,5 +1,5 @@
 func smallestDivisor(nums []int, threshold int) int {
-    left := 0
+    left := 1
     right := 1000000
 
     for left <= right {
@@ -10,6 +10,7 @@ func smallestDivisor(nums []int, threshold int) int {
             d += math.Ceil(float64(n)/float64(mid))
         }
 
+        fmt.Println(d, int(d), threshold, float64(threshold), d <= float64(threshold), int(d) <= threshold)
         if d <= float64(threshold) {
             right = mid -1
         } else {
