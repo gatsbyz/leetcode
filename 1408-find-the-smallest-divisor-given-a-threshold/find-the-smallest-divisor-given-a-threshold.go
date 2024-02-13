@@ -11,7 +11,7 @@ func smallestDivisor(nums []int, threshold int) int {
         }
 
         fmt.Println(d, int(d), threshold, float64(threshold), d <= float64(threshold), int(d) <= threshold)
-        if d <= float64(threshold) {
+        if int(d) <= threshold {
             right = mid -1
         } else {
             left = mid + 1
