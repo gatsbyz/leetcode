@@ -2,12 +2,12 @@ func rearrangeArray(nums []int) []int {
     rearranged := make([]int, len(nums))
     pos := 0
     neg := 1
-    for _, num := range nums{
-        if num > 0 {
-            rearranged[pos] = num
+    for i := range nums{
+        if nums[i] > 0 {
+            rearranged[pos] = nums[i]
             pos+=2
         } else {
-            rearranged[neg] = num
+            rearranged[neg] = nums[i]
             neg+=2
         }
     }
