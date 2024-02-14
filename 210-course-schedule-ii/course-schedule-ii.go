@@ -1,49 +1,44 @@
 func findOrder(numCourses int, prerequisites [][]int) []int {
-    // Adjacency list to represent the graph
-    graph := make([][]int, numCourses)
-    for _, pre := range prerequisites {
-        graph[pre[1]] = append(graph[pre[1]], pre[0])
+    search := make([][]int, numCourses) // watch out
+
+    for i := range prerequisites {
+        search[prerequisites[i][1]] = append(search[prerequisites[i][1]], prerequisites[i][0])
     }
 
-    // Visited array to track the state of each node (0 = unvisited, 1 = visiting, 2 = visited)
-    visited := make([]int, numCourses)
-    // Stack to store the topological order in reverse
     stack := []int{}
+    visited := make([]int, numCourses)
 
-    // DFS function to visit nodes
     var dfs func(course int) bool
+    // 0 not visited 1 in progress 2 completed
     dfs = func(course int) bool {
-        if visited[course] == 1 { // Cycle detected
+        if visited[course] == 1 {
             return false
-        }
-        if visited[course] == 2 { // Already visited
+        } else if visited[course] == 2 {
             return true
         }
 
-        // Mark as visiting
         visited[course] = 1
-        for _, nextCourse := range graph[course] {
-            if !dfs(nextCourse) {
+
+        for i := range search[course] {
+            if !dfs(search[course][i]) {
                 return false
             }
         }
-        // Mark as visited
+
         visited[course] = 2
-        // Add to stack (reverse topological order)
         stack = append(stack, course)
         return true
     }
 
-    // Perform DFS for each course
-    for i := 0; i < numCourses; i++ {
+    for i := 0 ; i < numCourses ; i++ {
         if !dfs(i) {
-            return []int{} // Cycle detected, return empty array
+            return []int{}
         }
     }
 
-    // Reverse the stack to get the correct topological order
-    for i, j := 0, len(stack)-1; i < j; i, j = i+1, j-1 {
-        stack[i], stack[j] = stack[j], stack[i]
+    for i,j := 0,len(stack)-1 ; i < j ; i, j = i+1, j-1 {
+        stack[j], stack[i] = stack[i], stack[j]
     }
+
     return stack
 }
