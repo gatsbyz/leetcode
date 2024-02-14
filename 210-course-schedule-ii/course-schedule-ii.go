@@ -1,87 +1,49 @@
 func findOrder(numCourses int, prerequisites [][]int) []int {
-    var result []int
-    
-    var queue []int
-    
-    indegree := make(map[int][]int)
-    adjacent := make(map[int][]int)
-    count := 0
-    
-    for _,  prerequisite := range  prerequisites {
-        src :=  prerequisite[1]
-        dst :=  prerequisite[0]
-        
-        indegree[dst] = append(indegree[dst], src)
-        adjacent[src] = append(adjacent[src], dst)
+    // Adjacency list to represent the graph
+    graph := make([][]int, numCourses)
+    for _, pre := range prerequisites {
+        graph[pre[1]] = append(graph[pre[1]], pre[0])
     }
-    
-    for i := 0; i < numCourses; i++ {
-        if len(indegree[i]) == 0 {
-            enqueue(&queue, i)
-            result = append(result, i)
-        }
-    }
-    
-    for len(queue) > 0 {
-        dequeuedEle := dequeue(&queue)
-        
-        for _, vertex := range adjacent[dequeuedEle] {
-            tmp := indegree[vertex]
-            remove(&tmp, dequeuedEle)
-            indegree[vertex] = tmp
 
-            if len(indegree[vertex]) == 0 {
-                enqueue(&queue, vertex)
-                result = append(result, vertex)
+    // Visited array to track the state of each node (0 = unvisited, 1 = visiting, 2 = visited)
+    visited := make([]int, numCourses)
+    // Stack to store the topological order in reverse
+    stack := []int{}
+
+    // DFS function to visit nodes
+    var dfs func(course int) bool
+    dfs = func(course int) bool {
+        if visited[course] == 1 { // Cycle detected
+            return false
+        }
+        if visited[course] == 2 { // Already visited
+            return true
+        }
+
+        // Mark as visiting
+        visited[course] = 1
+        for _, nextCourse := range graph[course] {
+            if !dfs(nextCourse) {
+                return false
             }
         }
-        
-        count += 1
+        // Mark as visited
+        visited[course] = 2
+        // Add to stack (reverse topological order)
+        stack = append(stack, course)
+        return true
     }
 
-    if count == numCourses {
-        return result
+    // Perform DFS for each course
+    for i := 0; i < numCourses; i++ {
+        if !dfs(i) {
+            return []int{} // Cycle detected, return empty array
+        }
     }
-    
-    return []int{}
-}
 
-func remove(lst *[]int, removedEle int) {
-	if lst == nil {
-		panic("nil pointer")
-	}
-
-	if len(*lst) == 0 {
-		panic("empty list")
-	}
-
-	for idx, num := range *lst {
-		if num == removedEle {
-			*lst = append((*lst)[:idx], (*lst)[idx+1:]...)
-		}
-	}
-}
-
-func enqueue(queue *[]int, newEle int) {
-    if queue == nil {
-        panic("nil pointer")
+    // Reverse the stack to get the correct topological order
+    for i, j := 0, len(stack)-1; i < j; i, j = i+1, j-1 {
+        stack[i], stack[j] = stack[j], stack[i]
     }
-    
-    *queue = append(*queue, newEle)
-}
-
-func dequeue(queue *[]int) int {
-    if queue == nil {
-        panic("nil pointer")
-    }
-    
-    if len(*queue) == 0 {
-        panic("empty queue")
-    }
-    
-    dequeuedEle := (*queue)[0]
-    
-    *queue = (*queue)[1:]
-    
-    return dequeuedEle
+    return stack
 }
