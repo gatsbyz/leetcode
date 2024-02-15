@@ -23,13 +23,7 @@ func alertNames(keyName []string, keyTime []string) []string {
             }
         } else {
             var diff int
-            if timeToNumber(time) < record[name].time {
-                diff = 24 * 60 - record[name].time + timeToNumber(time)
-            } else {
-                diff = timeToNumber(time) - record[name].time
-            }
-            fmt.Println(timeToNumber(time), record[name].time)
-            fmt.Println(record[name].diff, diff)
+            diff = timeToNumber(time) - record[name].time
             if record[name].diff + diff <= 60 {
                 if record[name].diff > 0 {
                     if !slices.Contains(alert, name) {
