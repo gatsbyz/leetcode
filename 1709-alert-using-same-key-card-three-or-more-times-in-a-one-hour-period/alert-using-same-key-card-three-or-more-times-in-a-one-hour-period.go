@@ -39,11 +39,6 @@ func alertNames(keyName []string, keyTime []string) []string {
     return alert
 }
 
-// keyName = ["daniel","daniel","daniel","luis","luis","luis","luis"],
-// keyTime = ["10:00","10:40","11:00", "13:00","15:00"]
-              //    40       20      120      
-              // 
-
 func timeToNumber(time string) int {
     timeSplit := strings.Split(time, ":")
     hour, _ := strconv.Atoi(timeSplit[0])
