@@ -6,47 +6,49 @@
  *     Right *TreeNode
  * }
  */
- 
+
 type key struct {
     node *TreeNode
     col int // the column of the node
 }
 
 func verticalOrder(root *TreeNode) [][]int {
-    m := map[int] []int {} // cols : nodes per column
-    queue := []key{ key{ root, 0 } }
-    min := 0 // minimum column
-    
-    for len(queue) != 0 {
+    queue := []key{ key{root, 0}}
+    traversal := [][]int{}
+    colMap := map[int][]int{}
+    minCol := 0
+    // 0: 4
+    //
+
+    for len(queue) > 0 {
         n := len(queue)
-        
-        for i := 0; i < n; i++ {
-            pop := queue[0]
+
+        for i:=0 ; i < n ; i++ {
+            current := queue[0]
             queue = queue[1:]
-            
-            if pop.node == nil {
+
+            if current.node == nil {
                 continue
             }
-            if pop.col < min {
-                min = pop.col
+
+            if minCol > current.col {
+                minCol = current.col
             }
-            
-            m[pop.col] = append(m[pop.col], pop.node.Val)
-            
-            queue = append(queue, 
-                key{ pop.node.Left, pop.col - 1 }, 
-                key{ pop.node.Right, pop.col + 1 },
-            )
+
+            colMap[current.col] = append(colMap[current.col], current.node.Val)
+
+            left := key{ current.node.Left, current.col - 1}
+            right := key{ current.node.Right, current.col + 1}
+
+            queue = append(queue, left, right)
         }
     }
-    
-    min *= -1
-    
-    res := make([][]int, len(m))
-    
-    for a, b := range m {
-        res[min + a] = b
+
+    fmt.Println(minCol, colMap, len(colMap))
+    for i:=minCol ; i < minCol + len(colMap) ; i++ {
+        traversal = append(traversal, colMap[i])
     }
-    
-    return res
+
+    return traversal
+
 }
