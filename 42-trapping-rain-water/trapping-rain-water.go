@@ -1,32 +1,30 @@
 func trap(height []int) int {
-    n := len(height)
-    res := 0
-    maxFromLeft := make([]int, n)
-    maxFromRight := make([]int, n)
-    for i := 1; i < n; i++ {
-        maxFromLeft[i] = max(maxFromLeft[i-1], height[i-1])
-    }
-    for j := n - 2; j >= 0; j-- {
-        maxFromRight[j] = max(maxFromRight[j+1], height[j+1])
-    }
-    for i := 1; i < n - 1; i++ {
-        if height[i] < maxFromLeft[i] && height[i] < maxFromRight[i] {
-            res += min(maxFromLeft[i], maxFromRight[i]) - height[i]
-        }
-    }
-    return res
-}
+	left, right := 0, len(height)-1 // Two pointers
+	leftMax, rightMax := 0, 0       // Max heights from both sides
+	trapped := 0                    // Total trapped water
 
-func min(a, b int) int {
-    if a < b {
-        return a
-    }
-    return b
-}
+	// Iterate until the two pointers meet
+	for left < right {
+		// Update leftMax and rightMax
+		if height[left] > leftMax {
+			leftMax = height[left]
+		}
+		if height[right] > rightMax {
+			rightMax = height[right]
+		}
 
-func max(a, b int) int {
-    if a > b {
-        return a
-    }
-    return b
+		// Calculate trapped water based on the smaller of the two max heights
+		if leftMax < rightMax {
+			// Water trapped on the current left position is the difference
+			// between leftMax and the current height, if any
+			trapped += leftMax - height[left]
+			left++ // Move left pointer inwards
+		} else {
+			// Similarly, water trapped on the current right position
+			trapped += rightMax - height[right]
+			right-- // Move right pointer inwards
+		}
+	}
+
+	return trapped
 }
