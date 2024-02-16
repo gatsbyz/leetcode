@@ -11,8 +11,6 @@ func findLeastNumOfUniqueInts(arr []int, k int) int {
         return cmp.Compare(a[1], b[1])
     })
 
-    fmt.Println(records)
-
     count := 0
     for _, record := range records {
         if k > 0 {
