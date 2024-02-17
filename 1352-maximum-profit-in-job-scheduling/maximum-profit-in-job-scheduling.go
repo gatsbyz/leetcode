@@ -1,49 +1,64 @@
-// Define a Job struct to hold the start, end time, and profit of each job.
-type Job struct {
-    start, end, profit int
+
+type job struct {
+	startTime int
+	endTime   int
+	profit    int
 }
 
-// maxProfit calculates the maximum profit you can achieve given job schedules.
-func jobScheduling(startTime, endTime, profit []int) int {
-    n := len(startTime)
-    jobs := make([]Job, n)
-    
-    // Populate jobs with start, end, and profit info.
-    for i := 0; i < n; i++ {
-        jobs[i] = Job{startTime[i], endTime[i], profit[i]}
-    }
-    
-    // Sort jobs based on their end time.
-    sort.Slice(jobs, func(i, j int) bool {
-        return jobs[i].end < jobs[j].end
-    })
+type jobs struct {
+	arr []job
+}
 
-    // dp array to store the maximum profit up to each job.
-    dp := make([]int, n)
-    dp[0] = jobs[0].profit
+func (j *jobs) Len() int {
+	return len(j.arr)
+}
 
-    // Iterate over jobs to fill dp with maximum profit values.
-    for i := 1; i < n; i++ {
-        // Initialize includeProfit with the profit of taking the current job.
-        includeProfit := jobs[i].profit
-        // Find profit from the last non-conflicting job.
-        for j := i - 1; j >= 0; j-- {
-            if jobs[j].end <= jobs[i].start {
-                includeProfit += dp[j]
-                break // Found the last non-conflicting job.
-            }
+func (j *jobs) Less(i, k int) bool {
+	return j.arr[i].endTime < j.arr[k].endTime
+}
+
+func (j *jobs) Swap(i, k int) {
+	j.arr[i], j.arr[k] = j.arr[k], j.arr[i]
+}
+
+func jobScheduling(startTime []int, endTime []int, profit []int) int {
+	jobArr := make([]job, len(startTime))
+	for i := range startTime {
+		jobArr[i] = job{startTime: startTime[i], endTime: endTime[i], profit: profit[i]}
+	}
+	sort.Sort(&jobs{arr: jobArr})
+	dp := make([]int, len(jobArr))
+    dp[0] = jobArr[0].profit
+	for i :=1;i<len(dp);i++ {
+        idx := findLastLessOrEqual(jobArr[i].startTime, jobArr)
+        var prevProfit int
+        if idx != -1 {
+            prevProfit = dp[idx]
         }
-        // Maximum profit at i is max of taking the current job or skipping it.
-        dp[i] = max(dp[i-1], includeProfit)
-    }
-
-    return dp[n-1] // The last element of dp contains the maximum profit.
+		dp[i] = maxInt(dp[i-1], prevProfit+jobArr[i].profit)
+	}
+	return dp[len(dp)-1] 
 }
 
-// max returns the maximum of two integers.
-func max(a, b int) int {
-    if a > b {
-        return a
-    }
-    return b
+func findLastLessOrEqual(target int, jobArr []job) int {
+	l := 0
+	r := len(jobArr)-1
+	res := -1
+	for l <= r {
+		m := (l+r)/2
+		if jobArr[m].endTime <= target {
+			res = m
+			l = m+1
+		}else {
+			r = m-1
+		}
+	}
+	return res
+}
+
+func maxInt(a, b int) int {
+	if a >b {
+		return a
+	}
+	return b
 }
