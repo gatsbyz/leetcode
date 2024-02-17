@@ -6,8 +6,8 @@ func numIslands(grid [][]byte) int {
             if grid[i][j] == '1' {
                 count++
                 
-                dfs(grid, i, j)
-				// bfs(grid, i, j)
+                // dfs(grid, i, j)
+				bfs(grid, i, j)
             }
         }
     }
@@ -29,9 +29,8 @@ func dfs(grid [][]byte, r, c int) {
 
 func bfs(grid [][]byte, r, c int) {
     q := [][2]int{}
-    
     q = append(q, [2]int{r,c})
-    grid[r][c] = '2'
+    grid[r][c] = 0
     
     offsets := [4][2]int{{-1,0}, {1,0}, {0,1}, {0,-1}}
     for len(q) > 0 {
@@ -44,7 +43,7 @@ func bfs(grid [][]byte, r, c int) {
             
             if x >= 0 && x < len(grid) && y >= 0 && y < len(grid[x]) && grid[x][y] == '1' {
                 q = append(q, [2]int{x,y})
-                grid[x][y] = 2
+                grid[x][y] = 0
             }
         }
     }
