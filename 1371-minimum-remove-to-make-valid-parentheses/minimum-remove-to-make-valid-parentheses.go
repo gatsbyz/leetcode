@@ -28,18 +28,16 @@ func minRemoveToMakeValid(s string) string {
         return s
     }
 
-    // Second pass: Rebuild the string without invalid parentheses
-    var builder strings.Builder
-    invalidIndexes := make(map[int]bool) // Track the indexes of invalid parentheses
-    for _, p := range stack {
-        invalidIndexes[p.index] = true
-    }
-
-    for i := 0; i < len(s); i++ {
-        if !invalidIndexes[i] {
-            builder.WriteByte(s[i]) // Append valid characters to the builder
+    stackIndex := 0
+    valid := ""
+    fmt.Println(stack)
+    for i:=0;i<len(s);i++ {
+        if  stackIndex < len(stack) && stack[stackIndex].index == i {
+            fmt.Println(stackIndex)
+            stackIndex++
+            continue
         }
+        valid += string(s[i])
     }
-
-    return builder.String() // Return the valid string
+    return valid
 }
