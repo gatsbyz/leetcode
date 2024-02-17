@@ -5,23 +5,23 @@ type job struct {
 	profit    int
 }
 
-// Define a jobs type to implement the sort.Interface for a slice of job.
-type jobs []job
+// // Define a jobs type to implement the sort.Interface for a slice of job.
+// type jobs []job
 
-// Len returns the number of elements in the collection.
-func (j jobs) Len() int {
-	return len(j)
-}
+// // Len returns the number of elements in the collection.
+// func (j jobs) Len() int {
+// 	return len(j)
+// }
 
-// Less reports whether the element with index i should sort before the element with index k.
-func (j jobs) Less(i, k int) bool {
-	return j[i].endTime < j[k].endTime
-}
+// // Less reports whether the element with index i should sort before the element with index k.
+// func (j jobs) Less(i, k int) bool {
+// 	return j[i].endTime < j[k].endTime
+// }
 
-// Swap swaps the elements with indexes i and k.
-func (j jobs) Swap(i, k int) {
-	j[i], j[k] = j[k], j[i]
-}
+// // Swap swaps the elements with indexes i and k.
+// func (j jobs) Swap(i, k int) {
+// 	j[i], j[k] = j[k], j[i]
+// }
 
 // jobScheduling finds the maximum profit you can achieve by scheduling non-overlapping jobs.
 func jobScheduling(startTime []int, endTime []int, profit []int) int {
@@ -32,15 +32,11 @@ func jobScheduling(startTime []int, endTime []int, profit []int) int {
 	}
 
 	// Sort jobs based on their end time to process them in chronological order.
-	sort.Sort(jobs(jobArr))
+	// sort.Sort(jobs(jobArr))
 
     slices.SortFunc(jobArr, func(a, b job) int {
         return cmp.Compare(a.endTime, b.endTime)
     })
-
-    // sort.Slice(jobArr, func(i, j int) bool {
-    //     return jobArr[i].endTime < jobArr[j].endTime
-    // })
 
 	// Initialize a DP array to store the maximum profit achievable up to each job.
 	dp := make([]int, len(jobArr))
