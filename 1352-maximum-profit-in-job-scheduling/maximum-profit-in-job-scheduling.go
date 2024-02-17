@@ -1,60 +1,46 @@
+// Define a Job struct to hold the start, end time, and profit of each job.
 type Job struct {
     start, end, profit int
 }
 
-// Helper function to perform binary search on the jobs slice.
-// Finds the last job that finishes before the specified start time.
-func findLastNonOverlappingJob(jobs []Job, startTime int) int {
-    lo, hi := 0, len(jobs)-1
-    for lo <= hi {
-        mid := lo + (hi-lo)/2
-        if jobs[mid].end <= startTime {
-            if mid == len(jobs)-1 || jobs[mid+1].end > startTime {
-                return mid
-            }
-            lo = mid + 1
-        } else {
-            hi = mid - 1
-        }
-    }
-    return -1 // Return -1 if no non-overlapping job is found.
-}
-
-// Function to calculate the maximum profit from job scheduling.
-func jobScheduling(startTime []int, endTime []int, profit []int) int {
+// maxProfit calculates the maximum profit you can achieve given job schedules.
+func jobScheduling(startTime, endTime, profit []int) int {
     n := len(startTime)
     jobs := make([]Job, n)
+    
+    // Populate jobs with start, end, and profit info.
     for i := 0; i < n; i++ {
         jobs[i] = Job{startTime[i], endTime[i], profit[i]}
     }
-
-    // Sort jobs based on their end times.
+    
+    // Sort jobs based on their end time.
     sort.Slice(jobs, func(i, j int) bool {
         return jobs[i].end < jobs[j].end
     })
 
-    // DP array to store the maximum profit up to each job.
+    // dp array to store the maximum profit up to each job.
     dp := make([]int, n)
     dp[0] = jobs[0].profit
 
+    // Iterate over jobs to fill dp with maximum profit values.
     for i := 1; i < n; i++ {
-        // Profit including the current job.
+        // Initialize includeProfit with the profit of taking the current job.
         includeProfit := jobs[i].profit
-        // Find the last job that does not overlap with the current one.
-        lastIndex := findLastNonOverlappingJob(jobs, jobs[i].start)
-        if lastIndex != -1 {
-            includeProfit += dp[lastIndex]
+        // Find profit from the last non-conflicting job.
+        for j := i - 1; j >= 0; j-- {
+            if jobs[j].end <= jobs[i].start {
+                includeProfit += dp[j]
+                break // Found the last non-conflicting job.
+            }
         }
-        // Maximum profit up to the current job is either by including the current job
-        // or by excluding it (which is the max profit up to the previous job).
+        // Maximum profit at i is max of taking the current job or skipping it.
         dp[i] = max(dp[i-1], includeProfit)
     }
 
-    // The last element in dp array contains the maximum profit for all jobs.
-    return dp[n-1]
+    return dp[n-1] // The last element of dp contains the maximum profit.
 }
 
-// Helper function to find the maximum of two integers.
+// max returns the maximum of two integers.
 func max(a, b int) int {
     if a > b {
         return a
