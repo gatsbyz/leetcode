@@ -1,43 +1,55 @@
-// furthestBuilding calculates the furthest building you can reach given a list of building heights,
-// a certain amount of bricks, and a certain number of ladders.
+// IntHeap defines a type that implements heap.Interface for min-heap operations on ints.
+type IntHeap []int
+
+// Len returns the number of elements in the heap.
+func (h IntHeap) Len() int { return len(h) }
+
+// Less reports whether the element with index i should sort before the element with index j.
+func (h IntHeap) Less(i, j int) bool { return h[i] < h[j] }
+
+// Swap swaps the elements with indexes i and j.
+func (h IntHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
+
+// Push adds a new element to the heap.
+func (h *IntHeap) Push(x interface{}) {
+    *h = append(*h, x.(int))
+}
+
+// Pop removes and returns the smallest element from the heap.
+func (h *IntHeap) Pop() interface{} {
+    old := *h
+    n := len(old)
+    x := old[n-1]
+    *h = old[:n-1]
+    return x
+}
+
+// furthestBuilding calculates the furthest building you can reach with given bricks and ladders.
 func furthestBuilding(heights []int, bricks int, ladders int) int {
-	q := hp{} // Create a new heap of type hp, which will store the height differences (jumps needed).
-	n := len(heights) // Get the total number of buildings.
-	
-    // Iterate through each building, except the last one, since you can't jump from the last building.
-	for i, a := range heights[:n-1] {
-		b := heights[i+1] // Get the height of the next building.
-		d := b - a // Calculate the difference in height (jump needed) to reach the next building.
-		
-        // If a jump is needed (the next building is higher),
-		if d > 0 {
-			heap.Push(&q, d) // Push the height difference onto the heap.
-			
-            // If the heap size exceeds the number of ladders available,
-			if q.Len() > ladders {
-				bricks -= heap.Pop(&q).(int) // Use bricks for the smallest jump (remove from heap)...
-				
-                // If bricks are depleted (negative count), you can't reach the next building.
-				if bricks < 0 {
-					return i // Return the index of the last building you can reach.
-				}
-			}
-		}
-	}
-	return n - 1 // If you haven't returned by now, you can reach the last building.
+    h := &IntHeap{}
+    heap.Init(h) // Initialize the heap to keep track of the heights where ladders are used.
+
+    // Iterate through each building to determine if you can move to the next one.
+    for i := 0; i < len(heights)-1; i++ {
+        diff := heights[i+1] - heights[i] // Calculate the height difference to the next building.
+
+        // If the next building is higher, consider using bricks or a ladder.
+        if diff > 0 {
+            heap.Push(h, diff) // Pretend to use a ladder by pushing the height difference onto the heap.
+            
+            // If we've used more ladders than available, replace one ladder usage with bricks.
+            if h.Len() > ladders {
+                bricks -= heap.Pop(h).(int) // Use bricks for the smallest height difference encountered so far.
+            }
+            
+            // If we don't have enough bricks to cover the next jump, we cannot move further.
+            if bricks < 0 {
+                return i
+            }
+        }
+    }
+    
+    // If we can traverse all buildings without running out of resources, return the last building index.
+    return len(heights) - 1
 }
 
-// hp defines a custom heap type that embeds sort.IntSlice to leverage its methods,
-// while also implementing heap's Push and Pop methods for int values.
-type hp struct{ sort.IntSlice }
-
-// Push adds an element (height difference that requires a jump) to the heap.
-func (h *hp) Push(v any) { h.IntSlice = append(h.IntSlice, v.(int)) }
-
-// Pop removes and returns the smallest element from the heap (the smallest height difference).
-func (h *hp) Pop() any {
-	a := h.IntSlice
-	v := a[len(a)-1] // Get the last element (smallest, due to min-heap property).
-	h.IntSlice = a[:len(a)-1] // Remove the last element from the slice.
-	return v // Return the removed element.
-}
