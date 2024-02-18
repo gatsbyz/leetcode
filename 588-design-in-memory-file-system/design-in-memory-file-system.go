@@ -54,12 +54,6 @@ func (fs *FileSystem) ReadContentFromFile(filePath string) string {
 }
 
 func (fs *FileSystem) discover(filePath string) *File {
-    if len(filePath) == 0 || filePath[0] != '/' {
-        return nil
-    } else if filePath == "/" {
-        return fs.root
-    }
-
     filePathSplits := strings.Split(filePath, "/")
 
     curr := fs.root
