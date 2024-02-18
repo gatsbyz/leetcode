@@ -1,70 +1,76 @@
-type FileNode struct {
-    children map[string]*FileNode // Children could be both files and directories
-    content  string               // Non-empty for files
-    isFile   bool
+type File struct {
+    children map[string]*File
+    contents string
+    isDirectory bool
 }
 
 type FileSystem struct {
-    root *FileNode
+    root *File
 }
+
 
 func Constructor() FileSystem {
-    return FileSystem{root: &FileNode{children: make(map[string]*FileNode)}}
+    return FileSystem{ &File{children: make(map[string]*File), isDirectory: true} }
 }
 
-func (this *FileSystem) Ls(path string) []string {
-    node := this.navigate(path)
-    if node.isFile {
-        // Extract file name from path
-        splitPath := strings.Split(path, "/")
-        return []string{splitPath[len(splitPath)-1]}
+
+func (fs *FileSystem) Ls(path string) []string {
+    file := fs.discover(path)
+    if file == nil {
+        return []string{}
     }
-    // Collect and return directory contents
-    var contents []string
-    for name := range node.children {
-        contents = append(contents, name)
-    }
-    sort.Strings(contents) // Sort results lexicographically
-    return contents
-}
-
-func (this *FileSystem) Mkdir(path string) {
-    this.navigate(path) // Simply navigate to the path, nodes will be created if not exist
-}
-
-func (this *FileSystem) AddContentToFile(filePath string, content string) {
-    node := this.navigate(filePath)
-    node.content += content // Append content
-    node.isFile = true      // Mark as file
-}
-
-func (this *FileSystem) ReadContentFromFile(filePath string) string {
-    node := this.navigate(filePath)
-    return node.content
-}
-
-// Helper function to navigate through the file system and optionally create nodes
-func (this *FileSystem) navigate(path string) *FileNode {
-    current := this.root
-    if path == "/" {
-        return current
-    }
-    parts := strings.Split(path, "/")[1:] // Ignore the first empty part due to leading '/'
-    for _, part := range parts {
-        if _, exists := current.children[part]; !exists {
-            current.children[part] = &FileNode{children: make(map[string]*FileNode)}
+    if file.isDirectory {
+        keys := make([]string, 0)
+        for name, _ := range file.children {
+            keys = append(keys,name)
         }
-        current = current.children[part]
+        slices.Sort(keys)
+        return keys
     }
-    return current
+    split := strings.Split(path, "/")
+    return split[len(split)-1:]
 }
 
 
-/**
- * Your FileSystem object will be instantiated and called as such:
- * obj := Constructor();
- * param_1 := obj.Ls(path);
- * obj.Mkdir(path);
- * obj.AddContentToFile(filePath,content);
- * param_4 := obj.ReadContentFromFile(filePath);
- */
+func (fs *FileSystem) Mkdir(path string)  {
+    fs.discover(path)
+}
+
+
+func (fs *FileSystem) AddContentToFile(filePath string, content string)  {
+    file := fs.discover(filePath)
+    // add conditional - when returned is a directory
+    file.isDirectory = false 
+    file.contents += content
+}
+
+
+func (fs *FileSystem) ReadContentFromFile(filePath string) string {
+    file := fs.discover(filePath)
+    if file.isDirectory {
+        // panic
+    }
+    return file.contents
+}
+
+func (fs *FileSystem) discover(filePath string) *File {
+    if len(filePath) == 0 || filePath[0] != '/' {
+        return nil
+    } else if filePath == "/" {
+        return fs.root
+    }
+
+    filePathSplits := strings.Split(filePath, "/")
+
+    curr := fs.root
+    for _, path := range filePathSplits {
+        if path == "" {
+            continue
+        }
+        if _, exists := curr.children[path] ; !exists {
+            curr.children[path] = &File{children: make(map[string]*File), isDirectory: true}
+        }
+        curr = curr.children[path]
+    }
+    return curr
+}
