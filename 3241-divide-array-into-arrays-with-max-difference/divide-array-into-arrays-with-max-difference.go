@@ -8,9 +8,9 @@ func divideArray(nums []int, k int) [][]int {
         arrayIndex := index / 3
         subIndex := index % 3
         if subIndex == 0 {
-            array = append(array, make([]int, 0))
+            array = append(array, make([]int, 3))
         }
-        array[arrayIndex] = append(array[arrayIndex], nums[index])
+        array[arrayIndex][subIndex] = nums[index]
         if (subIndex == 2 || index == len(nums)-1) && array[arrayIndex][len(array[arrayIndex])-1]-array[arrayIndex][0] > k {
             return [][]int{}
         }
