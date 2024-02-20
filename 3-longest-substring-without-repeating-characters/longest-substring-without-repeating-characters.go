@@ -1,5 +1,5 @@
 func lengthOfLongestSubstring(s string) int {
-    stack := [200]bool{}
+    stack := [128]bool{}
     maxCount := 0
     length := 0
     pointer := 0
