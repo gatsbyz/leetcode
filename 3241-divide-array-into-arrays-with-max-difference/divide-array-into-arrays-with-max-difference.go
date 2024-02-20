@@ -1,5 +1,5 @@
 func divideArray(nums []int, k int) [][]int {
-    sort.SliceStable(nums, func(i, j int) bool {
+    sort.Slice(nums, func(i, j int) bool {
         return nums[i] < nums[j]
     })
     array := [][]int{}
