@@ -1,5 +1,3 @@
-
-import "fmt"
 func longestCommonPrefix(strs []string) string {
     n := 0
     prefix := ""
