@@ -1,4 +1,7 @@
 func isPalindrome(x int) bool {
+    if x < 0 {
+		return false
+	}
     number := 0
     start := x
     for x > 0 {
