@@ -1,14 +1,10 @@
 
 import "fmt"
 func mySqrt(x int) int {
-    l, r := 0, x
-
-    if x == 0 || x == 1 {
-        return x
-    }
+    l, r := 0, x+1
 
     for l<r {
-        mid := (l+r)/2
+        mid := l + (r - l) / 2
         if mid*mid == x {
             return mid
         } else if mid*mid < x {
@@ -16,7 +12,6 @@ func mySqrt(x int) int {
         } else {
             r = mid
         }
-        fmt.Println(l, r,  mid)
     }
     return l-1
 
