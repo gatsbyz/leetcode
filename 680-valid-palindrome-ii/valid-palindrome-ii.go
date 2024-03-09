@@ -4,7 +4,6 @@ func validPalindrome(s string) bool {
     reverted := false
     var revertLeft, revertRight int
     for left < right {
-        fmt.Println(left, right, string(s[left]),  string(s[right]))
         if s[left] != s[right] {
             if token && s[left] == s[right-1] {
                 revertLeft, revertRight = left+1, right
@@ -16,7 +15,6 @@ func validPalindrome(s string) bool {
                 token = false
             }  else {
                 if !token && !reverted {
-                    fmt.Println("here", left, right)
                     left, right = revertLeft, revertRight
                     reverted = true
                 } else {
