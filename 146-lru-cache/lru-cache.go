@@ -1,69 +1,54 @@
-type Node struct {
-    prev, next *Node
-    key, value int
+
+import "container/list"
+type LRUCache struct {
+    cache *list.List
+    capacity int
+    value map[int]*list.Element
 }
 
-type LRUCache struct {
-    cacheMap          map[int]*Node
-    head, tail        *Node
-    capacity, current int
+type cacheItem struct {
+    key int
+    value int
 }
 
 func Constructor(capacity int) LRUCache {
-    head, tail := &Node{}, &Node{}
-    head.next = tail
-    tail.prev = head
-    return LRUCache{
-        cacheMap: make(map[int]*Node),
-        capacity: capacity,
-        head:     head,
-        tail:     tail,
-    }
+    return LRUCache{ cache: list.New(), capacity: capacity, value: make(map[int]*list.Element)}
 }
 
-func (this *LRUCache) Get(key int) int {
-    if node, exists := this.cacheMap[key]; exists {
-        this.moveToTail(node)
-        return node.value
-    }
-    return -1
-}
-
-func (this *LRUCache) Put(key int, value int) {
-    if node, exists := this.cacheMap[key]; exists {
-        node.value = value
-        this.moveToTail(node)
+func (c *LRUCache) Get(key int) int {
+    if _, exists := c.value[key]; !exists {
+        return -1
     } else {
-        if this.current == this.capacity {
-            this.evict()
-        }
-        node := &Node{key: key, value: value}
-        this.cacheMap[key] = node
-        this.addToTail(node)
-        this.current++
+        element := c.value[key]
+        c.cache.MoveToBack(element)
+        return element.Value.(*cacheItem).value
     }
 }
 
-func (this *LRUCache) moveToTail(node *Node) {
-    // Remove node from its current position
-    node.prev.next = node.next
-    node.next.prev = node.prev
-    // Add node to tail
-    this.addToTail(node)
+
+func (c *LRUCache) Put(key int, value int)  {
+    if element, exists := c.value[key]; exists {
+        element.Value.(*cacheItem).value = value
+        c.cache.MoveToBack(element)
+    } else {
+        element = c.cache.PushBack(&cacheItem{ key: key, value: value})
+        c.value[key] = element
+    }
+
+
+    if c.cache.Len() > c.capacity {
+		// Remove the front element from the cache and the map
+		frontElement := c.cache.Front()
+		c.cache.Remove(frontElement)
+		delete(c.value, frontElement.Value.(*cacheItem).key)
+	}
+
 }
 
-func (this *LRUCache) addToTail(node *Node) {
-    node.prev = this.tail.prev
-    node.next = this.tail
-    this.tail.prev.next = node
-    this.tail.prev = node
-}
 
-func (this *LRUCache) evict() {
-    // Remove the node right after head
-    lru := this.head.next
-    this.head.next = lru.next
-    lru.next.prev = this.head
-    delete(this.cacheMap, lru.key)
-    this.current--
-}
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * obj := Constructor(capacity);
+ * param_1 := obj.Get(key);
+ * obj.Put(key,value);
+ */
