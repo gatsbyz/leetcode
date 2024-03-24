@@ -1,11 +1,9 @@
 func findDuplicate(nums []int) int {
-    find := map[int]bool{}
     for _, num := range nums {
-        if _, ok := find[num]; !ok {
-            find[num] = true
-        } else {
-            return num
+        if nums[(num%len(nums))-1] / len(nums) > 0 {
+            return num%len(nums)
         }
+        nums[(num%len(nums))-1] += len(nums)
     }
 
     return -1
