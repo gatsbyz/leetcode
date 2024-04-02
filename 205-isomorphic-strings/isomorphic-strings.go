@@ -10,13 +10,12 @@ func isIsomorphicHelper(s string, t string) bool {
                 ref[s[index]] = t[index]
                 index++
                 continue
-            } else {
+            }
             if ref[s[index]] == t[index] {
                 index++
                 continue
             }
             return false
-        }
         }
         if _, exists := ref[s[index]]; !exists {
             ref[s[index]] = t[index]
